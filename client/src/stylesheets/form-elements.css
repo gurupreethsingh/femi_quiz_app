@@ -1,0 +1,14 @@
+input {
+      height: 40px;
+      padding: 10px 20px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      width: 100%;
+}
+
+.primary-contained-btn {
+      height: 40px;
+      background-color: var(--primary);
+      color: white;
+      padding: 10px 20px;
+}

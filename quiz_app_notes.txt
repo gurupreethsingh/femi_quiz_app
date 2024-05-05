@@ -18,7 +18,6 @@ steps :
       http://localhost:5173/
       copy paste this url in the browser to see your application up and running. 
 
-
       code : 
       C:\Users\PC\Desktop>cd femi_quiz_app
 
@@ -51,14 +50,13 @@ steps :
       ➜  press h + enter to show help
 *******************************************************************
 
-
 -------------------------------------------------------------------
 topic 2 : Hello world printing in App.jsx file. 
 and removing all the default coding from App.js , App.css, and index.css
 -------------------------------------------------------------------
 
-steps :     1. remove all the default coding from App.jsx file, and type hello world 
-            2. remove the default css coding from App.css and index.css. 
+steps : 1. remove all the default coding from App.jsx file, and type hello world 
+        2. remove the default css coding from App.css and index.css. 
 
       folder - client- src - 
       filename - App.jsx, App.css, index.css
@@ -70,21 +68,17 @@ steps :     1. remove all the default coding from App.jsx file, and type hello w
 
       function App() {
       return (
-      <>
+            <>
             <div>
             <h1>Hello world.</h1>
             </div>
-      </>
+            </>
       );
       }
-
       export default App;
 
       output : hello world.
-
 *******************************************************************
-
-
 
 -------------------------------------------------------------------
 topic 3 : change the title of the application from the index.html file.
@@ -112,7 +106,6 @@ adding tailwind css to our application.
                   </body>
             </html>
 
-
       intalling tailwind css. 
 
             npm install -D tailwindcss postcss autoprefixer
@@ -139,14 +132,284 @@ adding tailwind css to our application.
             @tailwind utilities;
 *******************************************************************
 
-
-
-
------------------------------------------------------------
-topic 4 : 
------------------------------------------------------------
+------------------------------------------------------------------
+topic 4 : making all the necessary folders in the project.
+-----------------------------------------------------------------
       Folder - client - src 
-      file - index.html
+      folders to make - components, pages, redux, stylesheets
+      components - 
+      pages - 
+      redux - 
+      stylesheets - 
+*******************************************************************
 
 
-***********************************************************
+-----------------------------------------------------------
+topic 5 : configure "antd" into our application.
+-----------------------------------------------------------
+     npm install antd
+
+     go add the antd , css link in out index.js(react) / main.jsx file( mern stack applications) 
+
+     file - index.js  
+
+      import React from "react";
+      import ReactDOM from "react-dom/client";
+      import App from "./App.jsx";
+      import "./index.css";
+      import "antd/dist/antd.min.css";
+
+      ReactDOM.createRoot(document.getElementById("root")).render(
+      <React.StrictMode>
+      <App />
+      </React.StrictMode>
+      );
+
+************************************************************
+
+------------------------------------------------------------------
+topic 6 : use antd components in your components.
+-----------------------------------------------------------------
+steps : 1. import the {Button} from te antd library at the top.
+        2. show the button as an html tag in your App.js file.
+
+      Folder - client - src 
+      file - App.js 
+
+      import "./App.css";
+      import { Button, Flex } from "antd";
+
+      function App() {
+      return (
+            <div className="App">
+                  <Flex>
+                  <h1 className="">Hello world</h1>
+                  <Button type="primary">Primary Button</Button>
+                  </Flex>
+            </div>
+            );
+      }
+
+      export default App;
+*******************************************************************
+
+------------------------------------------------------------------
+topic 7 : making or writing our own css code. 
+-----------------------------------------------------------------
+steps : 1. make a file in the stylesheets folder call it as allignments.css(we will be writing all the alignment stylying in this file.)
+      2. make another file in stylesheets folder, call it as theme.css
+      3. one more in the same folder. call it as. textElements.css (stylesheet for all the text related elements. )
+
+      Folder - client - src - stylesheets
+      file : allignments.css
+
+      .h-screen{height:100vh}.h-75{height:75vh}.h-50{height:50vh}.h-25{height:25vh}.w-screen{width:100%}.w-75{width:750%}.w-25,.w-50{width:50%}.w-400{width:400px}.flex{display:flex}.flex-col{flex-direction:column}.justify-center{justify-content:center}.justify-start{justify-content:flex-start}.justify-end{justify-content:flex-end}.justify-between{justify-content:space-between}.items-center{align-items:center}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.gap-1{gap:10px}.gap-2{gap:20px}.gap-3{gap:30px}.gap-4{gap:40px}.gap-5{gap:50px}.p-5{padding:50px}.p-4{padding:40px}.p-3{padding:30px}.p-2{padding:20px}.p-1{padding:10px}
+
+      file - textElements.css. 
+
+      .text-2xl{font-size:1.5rem;line-height:2rem}.text-lg,.text-xl{font-size:1.25rem}.text-xl{line-height:1.75rem}.text-lg{line-height:1.5rem}.text-md{font-size:1rem;line-height:1.25rem}.text-sm{font-size:.875rem;line-height:1rem}.text-xs{font-size:.75rem;line-height:.85rem}
+
+      theme.css
+
+      :root{--primary:#0F3460;--secondary:#ff5722;--success:#4caf50;--info:#00bcd4;--danger:#f44336;--warning:#ff9800;--light:#f1f1f1;--dark:#212121}
+       
+*******************************************************************
+
+------------------------------------------------------------------
+topic 8 : making the routes login and register front end pages. 
+-----------------------------------------------------------------
+steps :  
+      1. import browser router at the top of the file in App.js. 
+      import { BrowserRouter, Routes, Route } from "react-router-dom";
+      2. in pages folder, create 3 new folders. (common, user, admin)
+      3. make 2 folders in common folder, Login and Register, 
+      4. make Login.js file inside the Login folder. 
+      5. make Register.js file inside the Register folder. 
+      6. import the functional components Login.js and Register.js inside the App.js file, and make routes for both login and register page. 
+      using BrowserRouter.
+
+      Login.js 
+      import React from "react";
+
+      const Login = () => {
+      return (
+      <div>
+            <h1>login</h1>
+      </div>
+      );
+      };
+
+      export default Login;
+
+      Register.js 
+      import React from "react";
+
+      const Register = () => {
+      return (
+      <div>
+            <h1>Register</h1>
+      </div>
+      );
+      };
+
+      export default Register;
+
+      App.js 
+      import "./App.css";
+      import { Button, Flex } from "antd";
+      import "./stylesheets/theme.css";
+      import "./stylesheets/alignments.css";
+      import "./stylesheets/textelements.css";
+      import { BrowserRouter, Routes, Route } from "react-router-dom";
+      import Login from "./pages/common/Login/Login";
+      import Register from "./pages/common/Register/Register";
+
+      function App() {
+      return (
+            <BrowserRouter>
+            <Routes>
+                  <Route path="/login" element={<Login />}></Route>
+                  <Route path="/register" element={<Register />}></Route>
+            </Routes>
+            </BrowserRouter>
+      );
+      }
+
+      export default App;
+
+*******************************************************************
+
+------------------------------------------------------------------
+topic 9 : Designing the login page
+-----------------------------------------------------------------
+
+      file : Login.js 
+
+import React from "react";
+import { Form } from "antd";
+import { Link } from "react-router-dom";
+
+const Login = () => {
+  // onFinish function.
+  const onFinish = (values) => {
+    console.log(values);
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen w-screen">
+      <div className="card w-400 p-5">
+        <div className="flex flex-col">
+          <h1 className="text-3xl font-semibold pb-3 text-gray-500">Sign In</h1>
+          <div className="divider"></div>
+
+          <Form
+            layout="vertical pt-3"
+            className="text-gray-500"
+            onFinish={onFinish}
+          >
+            <Form.Item name="email" label="Email">
+              <input type="email" required />
+            </Form.Item>
+
+            <Form.Item name="password" label="Password">
+              <input type="password" required />
+            </Form.Item>
+
+            <button
+              type="submit"
+              className="primary-contained-btn font-semibold rounded w-100"
+            >
+              LOGIN
+            </button>
+
+            <div className="mt-3">
+              <Link to="/register" className="underline">
+                Need Account ? Register
+              </Link>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+
+
+form-elements.css 
+
+      input {
+            height: 40px;      padding: 10px 20px;      border: 2px solid #ccc;      border-radius: 10px;      width: 100%;
+      }
+
+      .primary-contained-btn {
+            height: 40px;      background-color: var(--primary);
+            color: white;      padding: 10px 20px;
+      }
+
+
+*******************************************************************
+
+------------------------------------------------------------------
+topic 10 : Designing the Register page
+-----------------------------------------------------------------
+
+file : Register.js 
+
+import React from "react";
+import { Form } from "antd";
+import { Link } from "react-router-dom";
+
+const Register = () => {
+  // onFinish function.
+  const onFinish = (values) => {
+    console.log(values);
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen w-screen">
+      <div className="card w-400 p-5">
+        <div className="flex flex-col">
+          <h1 className="text-3xl font-semibold pb-3 text-gray-500">
+            Register
+          </h1>
+          <div className="divider"></div>
+
+          <Form
+            layout="vertical pt-3"
+            className="text-gray-500"
+            onFinish={onFinish}
+          >
+            <Form.Item name="name" label="Name">
+              <input type="text" required />
+            </Form.Item>
+
+            <Form.Item name="email" label="Email">
+              <input type="email" required />
+            </Form.Item>
+
+            <Form.Item name="password" label="Password">
+              <input type="password" required />
+            </Form.Item>
+
+            <button
+              type="submit"
+              className="primary-contained-btn font-semibold rounded w-100"
+            >
+              REGISTER
+            </button>
+
+            <div className="mt-3">
+              <Link to="/login" className="underline">
+                Have an account ? Login
+              </Link>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
