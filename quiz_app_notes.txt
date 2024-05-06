@@ -413,3 +413,476 @@ const Register = () => {
 };
 
 export default Register;
+
+*******************************************************************
+
+------------------------------------------------------------------
+topic 11 : Setting up the backend for the application. 
+-----------------------------------------------------------------
+
+steps : 
+1. iniitialize npm in the root folder. by typing the command. (npm inti)
+this will create a file called as package.json in
+
+2. install all the necessary modules in the root folder of the project. 
+by typing the following command. 
+
+npm install express mongoose jsonwebtoken bcryptjs dotenv nodemon
+
+this will create the package-lock.json file. in our root folder. 
+3. create the .env file in the root folder of the application. 
+
+4. make a .env file inside the root folder of the application.
+
+4. create new folder inside the root folder of the application, call it as server. 
+
+5. inside this server folder make a file call it as server.js , and make our express app coding. 
+
+folder - server 
+file - server.js 
+
+      const express = require("express");
+
+      const app = express();
+
+      const port = process.env.PORT || 5000;
+
+      app.listen(port, (req, res) => {
+      console.log(`server successfully running at port ${port}`);
+      });
+
+open the server folder with a command prompt, and run the server.js file using the nodemon package. by typing the command.   
+"nodemon server"
+
+output : [nodemon] starting `node server.js`
+server successfully running at port 5000
+*******************************************************************
+
+------------------------------------------------------------------
+topic 12 : making the mongo db setup. 
+-----------------------------------------------------------------
+steps :  1. create mongo db account, or download locally. 
+2. make all the folders required for the server , 
+config, middlewares, models, routes. 
+
+.env 
+
+MONGO_URL=mongodb://127.0.0.1:27017/femi_quiz_app
+
+// writing the connection code in server.js file. 
+
+server.js 
+
+const express = require("express");
+const app = express();
+require("dotenv").config();
+const mongoose = require("mongoose");
+
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log("Connected to MongoDB successfully.");
+  })
+  .catch((error) => {
+    console.error("MongoDB connection error:", error);
+  });
+
+const port = process.env.PORT || 5000;
+
+app.listen(port, () => {
+  console.log(`Server successfully running at port ${port}`);
+});
+
+*******************************************************************
+
+------------------------------------------------------------------
+topic 13 : Creating the user model for our application. 
+-----------------------------------------------------------------
+
+make a file inside the models folder call it as userModel.js 
+  userModel.js 
+
+    const mongoose = require("mongoose");
+
+    const userSchema = new mongoose.Schema(
+      {
+        name: { type: String, required: true },
+        email: { type: String, required: true, uniquie: true },
+        password: { type: String, required: true },
+        isAdmin: { type: Boolean, default: false },
+      },
+      {
+        timestamps: true,
+      }
+    );
+
+    const userModel = mongoose.model("user", userSchema);
+
+    exports.modules = userModel;
+
+
+*******************************************************************
+
+------------------------------------------------------------------
+topic 14 : Creating the userRoutes in the userRoutes.js file 
+-----------------------------------------------------------------
+
+folder - routes. 
+file - userRoutes.js 
+
+    const router = require("express").Router();
+    const User = require("../models/userModel");
+    // we will be needing bcrypt for encrpyting the user's password.
+    const bcrypt = require("bcryptjs");
+    // these 3 are enough to build the api's
+
+    // api for registration.
+    router.post("/register", async (req, res) => {
+      try {
+        // check if theuser is already registered.
+        const userExists = await User.findOne({ email: req.body.email });
+
+        if (userExists) {
+          return res
+            .status(200)
+            .send({ message: "User already exists", success: false });
+        }
+
+        // if the user is not existing.
+        // hashing the password, using bcrypt js.
+        // generate the salt for the password,
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+        req.body.password = hashedPassword;
+
+        // new craete the new user.
+        const newUser = new User(req.body);
+        await newUser.save();
+        res.send({
+          message: "User created successfully.",
+          success: true,
+        });
+      } catch (error) {
+        res.status(500).send({
+          message: error.message,
+          data: error,
+          success: false,
+        });
+      }
+    });
+
+    module.exports = router;
+
+# now udpate the code in server.js file to ,
+
+  server.js
+
+    const express = require("express");
+    const app = express();
+    require("dotenv").config();
+    const mongoose = require("mongoose");
+    app.use(express.json());
+
+    const usersRoute = require("./routes/userRoutes");
+    app.use("/api/users", usersRoute);
+
+    mongoose
+      .connect(process.env.MONGO_URL)
+      .then(() => {
+        console.log("Connected to MongoDB successfully.");
+      })
+      .catch((error) => {
+        console.error("MongoDB connection error:", error);
+      });
+
+    const port = process.env.PORT || 5000;
+
+    app.listen(port, () => {
+      console.log(`Server successfully running at port ${port}`);
+    });
+*******************************************************************
+
+-------------------------------------------------------------------
+topic 15 : Connecting or integrating frontend with backend , for register
+-------------------------------------------------------------------
+
+steps : 
+1. in the front end . (client) inside the package.json file you have to add the proxy for the backend. 
+
+
+package.json 
+
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.2.3",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "antd": "^5.17.0",
+    "axios": "^1.6.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.1.2",
+    "react-router-dom": "^6.23.0",
+    "react-scripts": "5.0.1",
+    "redux": "^5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.3"
+  },
+  "proxy" : "http://localhost:5000"
+}
+
+2. make a folder in src folder, call it as api calls. 
+
+make a file in this one. call it as index.js
+
+index.js 
+
+import axios from "axios";
+
+const axiosInstance = axios.create({
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+});
+
+export default axiosInstance;
+
+3. now make a file inside the apicalls folder. call it as user.js 
+
+user.js 
+
+const { default: axiosInstance } = require(".");
+
+export const registerUser = async (payload) => {
+  console.log("register user.");
+  try {
+    const response = await axiosInstance.post("/api/user/register", payload);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+
+4. now write the code in front end page. Register.js, 
+to register the new user. 
+
+folder - src - pages - commons. 
+file - Register.js 
+
+import React from "react";
+import { Form, message } from "antd";
+import { Link } from "react-router-dom";
+import { registerUser } from "../../../apicalls/users";
+
+const Register = () => {
+  // onFinish function.
+  const onFinish = async (values) => {
+    try {
+      const response = await registerUser(values);
+      if (response.success) {
+        message.success(response.message);
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      message.error(error.message);
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen w-screen">
+      <div className="card w-400 p-5">
+        <div className="flex flex-col">
+          <h1 className="text-3xl font-semibold pb-3 text-gray-500">
+            Register
+          </h1>
+          <div className="divider"></div>
+
+          <Form
+            layout="vertical pt-3"
+            className="text-gray-500"
+            onFinish={onFinish}
+          >
+            <Form.Item name="name" label="Name">
+              <input type="text" required />
+            </Form.Item>
+
+            <Form.Item name="email" label="Email">
+              <input type="email" required />
+            </Form.Item>
+
+            <Form.Item name="password" label="Password">
+              <input type="password" required />
+            </Form.Item>
+
+            <button
+              type="submit"
+              className="primary-contained-btn font-semibold rounded w-100"
+            >
+              REGISTER
+            </button>
+
+            <div className="mt-3">
+              <Link to="/login" className="underline">
+                Have an account ? Login
+              </Link>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
+
+
+userRoute.js 
+const router = require("express").Router();
+const UserModel = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+// route for register
+router.post("/register", async (req, res) => {
+  try {
+    const userExists = await UserModel.findOne({ email: req.body.email });
+
+    if (userExists) {
+      return res
+        .status(200)
+        .send({ message: "User already exists", success: false });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    req.body.password = hashedPassword;
+
+    const newUser = new UserModel(req.body); // Use UserModel here
+    await newUser.save();
+    res.send({
+      message: "User created successfully.",
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).send({
+      message: error.message,
+      data: error,
+      success: false,
+    });
+  }
+});
+
+module.exports = router;
+
+
+users.js
+const { default: axiosInstance } = require(".");
+
+export const registerUser = async (payload) => {
+  try {
+    const response = await axiosInstance.post("/api/users/register", payload);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+
+
+-------------------------------------------------------------------
+topic 16 : Connecting or integrating frontend with backend , for login.
+-------------------------------------------------------------------
+
+login.js 
+
+import React from "react";
+import { Form, message } from "antd";
+import { Link } from "react-router-dom";
+import { loginUser } from "../../../apicalls/users";
+
+const Login = () => {
+  const onFinish = async (values) => {
+    try {
+      const response = await loginUser(values);
+      if (response.success) {
+        message.success(response.message);
+        localStorage.setItem("token", response.data);
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      message.error(error.message);
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen w-screen">
+      <div className="card w-400 p-5">
+        <div className="flex flex-col">
+          <h1 className="text-3xl font-semibold pb-3 text-gray-500">Sign In</h1>
+          <div className="divider"></div>
+
+          <Form
+            layout="vertical pt-3"
+            className="text-gray-500"
+            onFinish={onFinish}
+          >
+            <Form.Item name="email" label="Email">
+              <input type="email" required />
+            </Form.Item>
+
+            <Form.Item name="password" label="Password">
+              <input type="password" required />
+            </Form.Item>
+
+            <button
+              type="submit"
+              className="primary-contained-btn font-semibold rounded w-100"
+            >
+              LOGIN
+            </button>
+
+            <div className="mt-3">
+              <Link to="/register" className="underline">
+                Need Account ? Register
+              </Link>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
