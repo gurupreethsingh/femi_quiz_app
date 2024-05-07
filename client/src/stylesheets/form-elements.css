@@ -12,3 +12,17 @@ input {
       color: white;
       padding: 10px 20px;
 }
+
+.primary-outlined-btn {
+      background-color: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 10px 20px;
+      border-radius: 10px;
+}
+
+.primary-outlined-btn:hover {
+      background-color: var(--primary);
+      color: white;
+      transition: all 0.2s ease-in-out;
+}
