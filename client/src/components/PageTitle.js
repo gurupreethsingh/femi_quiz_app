@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react'
 
-const PageTitle = ({ title }) => {
+function PageTitle({title}) {
   return (
-    <div>
-      <h1 className="text-2xl">{title}</h1>
+    <div className='mt-2'>
+        <h1>{title}</h1>
     </div>
-  );
-};
+  )
+}
 
-export default PageTitle;
+export default PageTitle

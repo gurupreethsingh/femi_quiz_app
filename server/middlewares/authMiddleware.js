@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
     next();
   } catch (error) {
     res.status(401).send({
-      message: "you are not authenticated.",
+      message: "You are not authenticated",
       data: error,
       success: false,
     });

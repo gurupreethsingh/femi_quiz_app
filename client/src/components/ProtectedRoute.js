@@ -1,52 +1,41 @@
-import React, { useEffect, useState } from "react";
 import { message } from "antd";
+import React, { useEffect, useState } from "react";
 import { getUserInfo } from "../apicalls/users";
 import { useDispatch, useSelector } from "react-redux";
 import { SetUser } from "../redux/usersSlice.js";
-import { IoClose } from "react-icons/io5";
-import { CiHome } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
-import { IoStatsChartOutline } from "react-icons/io5";
-import { CgProfile } from "react-icons/cg";
-import { IoLogOutOutline } from "react-icons/io5";
-import { RxHamburgerMenu } from "react-icons/rx";
-import { PiExam } from "react-icons/pi";
+import { HideLoading, ShowLoading } from "../redux/loaderSlice";
 
-const ProtectedRoute = ({ children }) => {
+function ProtectedRoute({ children }) {
+  const { user } = useSelector((state) => state.users);
   const [menu, setMenu] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
-  const { user } = useSelector((state) => state.users);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // make the function getUserData()
 
-  // create menu items.
   const userMenu = [
     {
       title: "Home",
-      paths: ["/"],
-      icon: <CiHome />,
+      paths: ["/", "/user/write-exam"],
+      icon: <i className="ri-home-line"></i>,
       onClick: () => navigate("/"),
     },
-
     {
       title: "Reports",
-      paths: ["/reports"],
-      icon: <IoStatsChartOutline />,
-      onClick: () => navigate("/reports"),
+      paths: ["/user/reports"],
+      icon: <i className="ri-bar-chart-line"></i>,
+      onClick: () => navigate("/user/reports"),
     },
-
     {
       title: "Profile",
       paths: ["/profile"],
-      icon: <CgProfile />,
+      icon: <i className="ri-user-line"></i>,
       onClick: () => navigate("/profile"),
     },
-
     {
       title: "Logout",
       paths: ["/logout"],
-      icon: <IoLogOutOutline />,
+      icon: <i className="ri-logout-box-line"></i>,
       onClick: () => {
         localStorage.removeItem("token");
         navigate("/login");
@@ -57,36 +46,32 @@ const ProtectedRoute = ({ children }) => {
   const adminMenu = [
     {
       title: "Home",
-      paths: ["/"],
-      icon: <CiHome />,
+      paths: ["/", "/user/write-exam"],
+      icon: <i className="ri-home-line"></i>,
       onClick: () => navigate("/"),
     },
-
     {
       title: "Exams",
       paths: ["/admin/exams", "/admin/exams/add"],
-      icon: <PiExam />,
+      icon: <i className="ri-file-list-line"></i>,
       onClick: () => navigate("/admin/exams"),
     },
-
     {
       title: "Reports",
-      paths: ["/reports"],
-      icon: <IoStatsChartOutline />,
+      paths: ["/admin/reports"],
+      icon: <i className="ri-bar-chart-line"></i>,
       onClick: () => navigate("/admin/reports"),
     },
-
     {
       title: "Profile",
       paths: ["/profile"],
-      icon: <CiHome />,
+      icon: <i className="ri-user-line"></i>,
       onClick: () => navigate("/profile"),
     },
-
     {
       title: "Logout",
       paths: ["/logout"],
-      icon: <IoLogOutOutline />,
+      icon: <i className="ri-logout-box-line"></i>,
       onClick: () => {
         localStorage.removeItem("token");
         navigate("/login");
@@ -96,9 +81,10 @@ const ProtectedRoute = ({ children }) => {
 
   const getUserData = async () => {
     try {
+      dispatch(ShowLoading());
       const response = await getUserInfo();
+      dispatch(HideLoading());
       if (response.success) {
-        // message.success(response.message);
         dispatch(SetUser(response.data));
         if (response.data.isAdmin) {
           setMenu(adminMenu);
@@ -109,66 +95,83 @@ const ProtectedRoute = ({ children }) => {
         message.error(response.message);
       }
     } catch (error) {
+      navigate("/login");
+      dispatch(HideLoading());
       message.error(error.message);
     }
   };
 
   useEffect(() => {
-    // call the getUserData() function.
-    getUserData();
+    if (localStorage.getItem("token")) {
+      getUserData();
+    } else {
+      navigate("/login");
+    }
   }, []);
 
-  // find the active route or page.
   const activeRoute = window.location.pathname;
 
   const getIsActiveOrNot = (paths) => {
     if (paths.includes(activeRoute)) {
       return true;
     } else {
-      return false;
+      if (
+        activeRoute.includes("/admin/exams/edit") &&
+        paths.includes("/admin/exams")
+      ) {
+        return true;
+      }
+      if (
+        activeRoute.includes("/user/write-exam") &&
+        paths.includes("/user/write-exam")
+      ) {
+        return true;
+      }
     }
+    return false;
   };
 
   return (
     <div className="layout">
       <div className="flex gap-2 w-full h-full h-100">
         <div className="sidebar">
-          <div className="text-xl text-white">
-            <div className="menu">
-              {menu.map((item, index) => {
-                return (
-                  <div
-                    className={`menu-item ${
-                      getIsActiveOrNot(item.paths) && "active-menu-item"
-                    }`}
-                    key={index}
-                    onClick={item.onClick}
-                  >
-                    {item.icon}
-                    {!collapsed && (
-                      <span className="text-white">{item.title}</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+          <div className="menu">
+            {menu.map((item, index) => {
+              return (
+                <div
+                  className={`menu-item ${
+                    getIsActiveOrNot(item.paths) && "active-menu-item"
+                  }`}
+                  key={index}
+                  onClick={item.onClick}
+                >
+                  {item.icon}
+                  {!collapsed && <span>{item.title}</span>}
+                </div>
+              );
+            })}
           </div>
         </div>
         <div className="body">
-          <div className="header flex justify-between items-center">
-            {!collapsed && <IoClose onClick={() => setCollapsed(true)} />}
-
-            {collapsed && (
-              <RxHamburgerMenu onClick={() => setCollapsed(false)} size={30} />
+          <div className="header flex justify-between">
+            {!collapsed && (
+              <i
+                className="ri-close-line"
+                onClick={() => setCollapsed(true)}
+              ></i>
             )}
-
-            <h1 className="text-2xl">Femi Quiz App</h1>
-
-            <div className="flex justify-between items-center gap-1">
-              <CgProfile size={25} />
-              <h1 className="text-2xl text-white mr-5 underline">
-                {user?.name}
-              </h1>
+            {collapsed && (
+              <i
+                className="ri-menu-line"
+                onClick={() => setCollapsed(false)}
+              ></i>
+            )}
+            <h1 className="text-2xl text-white">SHEY QUIZ</h1>
+            <div>
+              <div className="flex gap-1 items-center">
+                <h1 className="text-md text-white">{user?.name}</h1>
+              </div>
+              <span>Role : {user?.isAdmin ? "Admin" : "User"}</span>
             </div>
           </div>
           <div className="content">{children}</div>
@@ -176,6 +179,6 @@ const ProtectedRoute = ({ children }) => {
       </div>
     </div>
   );
-};
+}
 
 export default ProtectedRoute;
