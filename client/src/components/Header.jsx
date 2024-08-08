@@ -26,33 +26,99 @@ export default function Header() {
   };
   const toggleAvatarDropdown = () => setAvatarDropdownOpen(!avatarDropdownOpen);
 
-  const solutions = [
+  const allprojects = [
     {
-      name: "Analytics",
+      name: "All Projects",
       description: "Get a better understanding of your traffic",
-      href: "#",
+      href: "/projects",
       icon: FiBarChart2,
     },
     {
-      name: "Engagement",
+      name: "Java Projects",
       description: "Speak directly to your customers",
       href: "#",
       icon: FiMonitor,
     },
     {
-      name: "Security",
+      name: "Mern Stack Projects",
       description: "Your customers' data will be safe and secure",
       href: "#",
       icon: FiShield,
     },
     {
-      name: "Integrations",
+      name: "AI projects",
       description: "Connect with third-party tools",
       href: "#",
       icon: FiLayers,
     },
     {
-      name: "Automations",
+      name: "Wordpress Projects",
+      description: "Build strategic funnels that will convert",
+      href: "#",
+      icon: FiRefreshCw,
+    },
+  ];
+
+  const allcourses = [
+    {
+      name: "All Courses",
+      description: "Get a better understanding of your traffic",
+      href: "/all-courses",
+      icon: FiBarChart2,
+    },
+    {
+      name: "Python",
+      description: "Speak directly to your customers",
+      href: "#",
+      icon: FiMonitor,
+    },
+    {
+      name: "Mern Stack",
+      description: "Your customers' data will be safe and secure",
+      href: "#",
+      icon: FiShield,
+    },
+    {
+      name: "AI projects",
+      description: "Connect with third-party tools",
+      href: "#",
+      icon: FiLayers,
+    },
+    {
+      name: "Wordpress",
+      description: "Build strategic funnels that will convert",
+      href: "#",
+      icon: FiRefreshCw,
+    },
+  ];
+
+  const allexams = [
+    {
+      name: "All Exams",
+      description: "Get a better understanding of your traffic",
+      href: "/all-exams",
+      icon: FiBarChart2,
+    },
+    {
+      name: "Java Exam",
+      description: "Speak directly to your customers",
+      href: "#",
+      icon: FiMonitor,
+    },
+    {
+      name: "Pyhton Exam",
+      description: "Your customers' data will be safe and secure",
+      href: "#",
+      icon: FiShield,
+    },
+    {
+      name: "Semister Exam",
+      description: "Connect with third-party tools",
+      href: "#",
+      icon: FiLayers,
+    },
+    {
+      name: "Monthly Exam",
       description: "Build strategic funnels that will convert",
       href: "#",
       icon: FiRefreshCw,
@@ -71,17 +137,17 @@ export default function Header() {
     {
       name: "Projects",
       dropdown: true,
-      content: solutions,
+      content: allprojects,
     },
     {
       name: "Courses",
       dropdown: true,
-      content: solutions,
+      content: allcourses,
     },
     {
       name: "Exams",
       dropdown: true,
-      content: solutions,
+      content: allexams,
     },
   ];
 
@@ -145,7 +211,7 @@ export default function Header() {
               {avatarDropdownOpen && (
                 <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
                   <a
-                    href="#"
+                    href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FiUser className="inline mr-2" /> Your Profile
@@ -157,7 +223,7 @@ export default function Header() {
                     Settings
                   </a>
                   <a
-                    href="#"
+                    href="/login"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FiLogOut className="inline mr-2" /> Sign out
@@ -254,13 +320,13 @@ export default function Header() {
           {/* Right-side content for larger screens */}
           <div className="hidden sm:flex sm:items-center">
             <a
-              href="#"
+              href="/login"
               className="text-sm text-gray-700 hover:text-black px-3 py-2"
             >
               Login
             </a>
             <a
-              href="#"
+              href="/register"
               className="text-sm text-gray-700 hover:text-black px-3 py-2"
             >
               Register
@@ -282,19 +348,19 @@ export default function Header() {
               {avatarDropdownOpen && (
                 <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
                   <a
-                    href="#"
+                    href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FiUser className="inline mr-2" /> Your Profile
                   </a>
-                  <a
+                  {/* <a
                     href="#"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Settings
-                  </a>
+                  </a> */}
                   <a
-                    href="#"
+                    href="/login"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FiLogOut className="inline mr-2" /> Sign out
@@ -323,13 +389,13 @@ export default function Header() {
           <div className="pt-4 pb-3 border-t border-gray-200">
             <div className="px-2 space-y-1">
               <a
-                href="#"
+                href="/login"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
               >
                 Login
               </a>
               <a
-                href="#"
+                href="/register"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
               >
                 Register
