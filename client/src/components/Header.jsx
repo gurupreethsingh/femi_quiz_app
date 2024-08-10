@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom"; // Import the useLocation hook
 import {
   FiMenu,
   FiX,
@@ -17,8 +18,9 @@ import ecoders_logo from "../assets/ecoders_logo.png"; // Ensure this path is co
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState(null); // State to manage which dropdown is open
+  const [openDropdown, setOpenDropdown] = useState(null);
   const [avatarDropdownOpen, setAvatarDropdownOpen] = useState(false);
+  const location = useLocation(); // Get the current URL path
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleDropdown = (dropdown) => {
@@ -100,19 +102,19 @@ export default function Header() {
       icon: FiBarChart2,
     },
     {
-      name: "Java Exam",
+      name: "Upcoming Exam",
       description: "Speak directly to your customers",
       href: "#",
       icon: FiMonitor,
     },
     {
-      name: "Pyhton Exam",
+      name: "Previous Exam",
       description: "Your customers' data will be safe and secure",
       href: "#",
       icon: FiShield,
     },
     {
-      name: "Semister Exam",
+      name: "Semester Exam",
       description: "Connect with third-party tools",
       href: "#",
       icon: FiLayers,
@@ -126,14 +128,14 @@ export default function Header() {
   ];
 
   const callsToAction = [
-    { name: "Watch demo", href: "#", icon: FiPlayCircle },
-    { name: "Contact sales", href: "#", icon: FiPhone },
+    { name: "Watch instruction video", href: "#", icon: FiPlayCircle },
+    { name: "Contact School", href: "/contact", icon: FiPhone },
   ];
 
   const navigation = [
-    { name: "Home", href: "/", current: true },
-    { name: "About", href: "/about", current: false },
-    { name: "Contact", href: "/contact", current: false },
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
     {
       name: "Projects",
       dropdown: true,
@@ -217,12 +219,6 @@ export default function Header() {
                     <FiUser className="inline mr-2" /> Your Profile
                   </a>
                   <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Settings
-                  </a>
-                  <a
                     href="/login"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
@@ -235,8 +231,9 @@ export default function Header() {
 
           {/* Desktop Menu Items */}
           <div className="hidden sm:flex sm:space-x-4 sm:ml-6">
-            {navigation.map((item) =>
-              item.dropdown ? (
+            {navigation.map((item) => {
+              const isCurrent = location.pathname === item.href;
+              return item.dropdown ? (
                 <div key={item.name} className="relative dropdown">
                   <button
                     className="inline-flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900 mt-1"
@@ -303,9 +300,9 @@ export default function Header() {
                 <a
                   key={item.name}
                   href={item.href}
-                  aria-current={item.current ? "page" : undefined}
+                  aria-current={isCurrent ? "page" : undefined}
                   className={classNames(
-                    item.current
+                    isCurrent
                       ? "bg-gray-200 text-black"
                       : "text-gray-700 hover:bg-gray-100 hover:text-black",
                     "rounded-md px-3 py-2 text-sm font-medium"
@@ -313,8 +310,8 @@ export default function Header() {
                 >
                   {item.name}
                 </a>
-              )
-            )}
+              );
+            })}
           </div>
 
           {/* Right-side content for larger screens */}
@@ -353,12 +350,6 @@ export default function Header() {
                   >
                     <FiUser className="inline mr-2" /> Your Profile
                   </a>
-                  {/* <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Settings
-                  </a> */}
                   <a
                     href="/login"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

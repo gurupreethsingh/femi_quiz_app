@@ -20,7 +20,6 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Courses from "./pages/Courses";
 import SingleCourse from "./pages/SingleCourse";
-import BlogPage from "./pages/BlogPage";
 import SingleTutorial from "./pages/SingleTutorial";
 
 function App() {
@@ -49,9 +48,8 @@ function App() {
           <Route path="/*" element={<PageNotFound />}></Route>
           <Route path="/all-courses" element={<Courses />}></Route>
           <Route path="/single-course/:id" element={<SingleCourse />}></Route>
-          <Route path="/blogpage" element={<BlogPage />}></Route>
           <Route
-            path="/single-tutirial/:id"
+            path="/single-tutorial/:id"
             element={<SingleTutorial />}
           ></Route>
         </Routes>
