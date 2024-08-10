@@ -1,6 +1,30 @@
+import { useState } from "react";
 import { FiMail } from "react-icons/fi";
+import axios from "axios";
 
 const ForgotPassword = () => {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    setError("");
+
+    try {
+      const response = await axios.post("/forgot-password", { email });
+      
+      if (response.status === 200) {
+        setMessage("A password reset link has been sent to your email.");
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Something went wrong. Please try again."
+      );
+    }
+  };
+
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -17,7 +41,10 @@ const ForgotPassword = () => {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form action="#" method="POST" className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {message && <div className="text-green-500 text-sm">{message}</div>}
+          {error && <div className="text-red-500 text-sm">{error}</div>}
+          
           <div>
             <label
               htmlFor="email"
@@ -32,6 +59,8 @@ const ForgotPassword = () => {
                 type="email"
                 required
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
             </div>
