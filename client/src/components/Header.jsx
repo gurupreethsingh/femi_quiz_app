@@ -20,13 +20,33 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [avatarDropdownOpen, setAvatarDropdownOpen] = useState(false);
+<<<<<<< HEAD
   const location = useLocation(); // Get the current URL path
+=======
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setIsLoggedIn(true);
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+>>>>>>> 033917d046c9641d5a34dbdb93b5edd3a65971a5
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleDropdown = (dropdown) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
   const toggleAvatarDropdown = () => setAvatarDropdownOpen(!avatarDropdownOpen);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    setUser(null);
+  };
 
   const allprojects = [
     {
@@ -133,6 +153,7 @@ export default function Header() {
   ];
 
   const navigation = [
+<<<<<<< HEAD
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
@@ -151,6 +172,30 @@ export default function Header() {
       dropdown: true,
       content: allexams,
     },
+=======
+    { name: "Home", href: "/", current: true },
+    { name: "About", href: "/about", current: false },
+    { name: "Contact", href: "/contact", current: false },
+    ...(isLoggedIn
+      ? [
+          {
+            name: "Projects",
+            dropdown: true,
+            content: allprojects,
+          },
+          {
+            name: "Courses",
+            dropdown: true,
+            content: allcourses,
+          },
+          {
+            name: "Exams",
+            dropdown: true,
+            content: allexams,
+          },
+        ]
+      : []),
+>>>>>>> 033917d046c9641d5a34dbdb93b5edd3a65971a5
   ];
 
   function classNames(...classes) {
@@ -197,6 +242,7 @@ export default function Header() {
 
           {/* Right-side content for mobile view */}
           <div className="flex items-center sm:hidden">
+<<<<<<< HEAD
             {/* Profile dropdown for mobile */}
             <div className="ml-3 relative">
               <button
@@ -227,6 +273,54 @@ export default function Header() {
                 </div>
               )}
             </div>
+=======
+            {isLoggedIn ? (
+              <div className="ml-3 relative">
+                <button
+                  onClick={toggleAvatarDropdown}
+                  className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white"
+                >
+                  <span className="sr-only">Open user menu</span>
+                  <img
+                    alt=""
+                    src={user.avatar || "https://via.placeholder.com/150"}
+                    className="h-8 w-8 rounded-full"
+                  />
+                </button>
+                {avatarDropdownOpen && (
+                  <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                    <a
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <FiUser className="inline mr-2" /> Your Profile
+                    </a>
+                    <a
+                      onClick={handleLogout}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                    >
+                      <FiLogOut className="inline mr-2" /> Sign out
+                    </a>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center">
+                <a
+                  href="/login"
+                  className="text-sm text-gray-700 hover:text-black px-3 py-2"
+                >
+                  Login
+                </a>
+                <a
+                  href="/register"
+                  className="text-sm text-gray-700 hover:text-black px-3 py-2"
+                >
+                  Register
+                </a>
+              </div>
+            )}
+>>>>>>> 033917d046c9641d5a34dbdb93b5edd3a65971a5
           </div>
 
           {/* Desktop Menu Items */}
@@ -316,38 +410,14 @@ export default function Header() {
 
           {/* Right-side content for larger screens */}
           <div className="hidden sm:flex sm:items-center">
-            <a
-              href="/login"
-              className="text-sm text-gray-700 hover:text-black px-3 py-2"
-            >
-              Login
-            </a>
-            <a
-              href="/register"
-              className="text-sm text-gray-700 hover:text-black px-3 py-2"
-            >
-              Register
-            </a>
-
-            {/* Profile dropdown */}
-            <div className="ml-3 relative">
-              <button
-                onClick={toggleAvatarDropdown}
-                className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white"
-              >
-                <span className="sr-only">Open user menu</span>
-                <img
-                  alt=""
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  className="h-8 w-8 rounded-full"
-                />
-              </button>
-              {avatarDropdownOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                  <a
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            {isLoggedIn ? (
+              <>
+                <div className="ml-3 relative">
+                  <button
+                    onClick={toggleAvatarDropdown}
+                    className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white"
                   >
+<<<<<<< HEAD
                     <FiUser className="inline mr-2" /> Your Profile
                   </a>
                   <a
@@ -356,9 +426,49 @@ export default function Header() {
                   >
                     <FiLogOut className="inline mr-2" /> Sign out
                   </a>
+=======
+                    <span className="sr-only">Open user menu</span>
+                    <img
+                      alt=""
+                      src={user.avatar || "https://via.placeholder.com/150"}
+                      className="h-8 w-8 rounded-full"
+                    />
+                  </button>
+                  {avatarDropdownOpen && (
+                    <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                      <a
+                        href="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <FiUser className="inline mr-2" /> Your Profile
+                      </a>
+                      <a
+                        onClick={handleLogout}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      >
+                        <FiLogOut className="inline mr-2" /> Sign out
+                      </a>
+                    </div>
+                  )}
+>>>>>>> 033917d046c9641d5a34dbdb93b5edd3a65971a5
                 </div>
-              )}
-            </div>
+              </>
+            ) : (
+              <>
+                <a
+                  href="/login"
+                  className="text-sm text-gray-700 hover:text-black px-3 py-2"
+                >
+                  Login
+                </a>
+                <a
+                  href="/register"
+                  className="text-sm text-gray-700 hover:text-black px-3 py-2"
+                >
+                  Register
+                </a>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -377,22 +487,42 @@ export default function Header() {
               </a>
             ))}
           </div>
-          <div className="pt-4 pb-3 border-t border-gray-200">
-            <div className="px-2 space-y-1">
-              <a
-                href="/login"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
-              >
-                Login
-              </a>
-              <a
-                href="/register"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
-              >
-                Register
-              </a>
+          {isLoggedIn && (
+            <div className="pt-4 pb-3 border-t border-gray-200">
+              <div className="px-2 space-y-1">
+                <a
+                  href="/profile"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
+                >
+                  Your Profile
+                </a>
+                <a
+                  onClick={handleLogout}
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600 cursor-pointer"
+                >
+                  Sign out
+                </a>
+              </div>
             </div>
-          </div>
+          )}
+          {!isLoggedIn && (
+            <div className="pt-4 pb-3 border-t border-gray-200">
+              <div className="px-2 space-y-1">
+                <a
+                  href="/login"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
+                >
+                  Login
+                </a>
+                <a
+                  href="/register"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
+                >
+                  Register
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </nav>
