@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // Import the useLocation hook
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   FiMenu,
   FiX,
@@ -14,15 +14,14 @@ import {
   FiPhone,
   FiPlayCircle,
 } from "react-icons/fi";
-import ecoders_logo from "../assets/ecoders_logo.png"; // Ensure this path is correct
+import ecoders_logo from "../assets/ecoders_logo.png";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [avatarDropdownOpen, setAvatarDropdownOpen] = useState(false);
-<<<<<<< HEAD
-  const location = useLocation(); // Get the current URL path
-=======
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -31,9 +30,34 @@ export default function Header() {
     if (storedUser) {
       setIsLoggedIn(true);
       setUser(JSON.parse(storedUser));
+    } else {
+      // Redirect to login page if trying to access restricted pages while logged out
+      const restrictedPaths = [
+        "/projects",
+        "/all-courses",
+        "/all-exams",
+        "/student-dashboard",
+        "/teacher-dashboard",
+        "/admin-dashboard",
+        "/hr-dashboard",
+      ];
+      if (restrictedPaths.includes(location.pathname)) {
+        navigate("/login");
+      }
     }
-  }, []);
->>>>>>> 033917d046c9641d5a34dbdb93b5edd3a65971a5
+
+    // Disable the back button for restricted pages
+    window.history.pushState(null, null, window.location.href);
+    window.addEventListener("popstate", () => {
+      window.history.pushState(null, null, window.location.href);
+    });
+
+    return () => {
+      window.removeEventListener("popstate", () => {
+        window.history.pushState(null, null, window.location.href);
+      });
+    };
+  }, [navigate, location.pathname]);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleDropdown = (dropdown) => {
@@ -46,6 +70,7 @@ export default function Header() {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     setUser(null);
+    navigate("/login"); // Redirect to login page
   };
 
   const allprojects = [
@@ -153,29 +178,9 @@ export default function Header() {
   ];
 
   const navigation = [
-<<<<<<< HEAD
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
-    {
-      name: "Projects",
-      dropdown: true,
-      content: allprojects,
-    },
-    {
-      name: "Courses",
-      dropdown: true,
-      content: allcourses,
-    },
-    {
-      name: "Exams",
-      dropdown: true,
-      content: allexams,
-    },
-=======
-    { name: "Home", href: "/", current: true },
-    { name: "About", href: "/about", current: false },
-    { name: "Contact", href: "/contact", current: false },
     ...(isLoggedIn
       ? [
           {
@@ -195,7 +200,6 @@ export default function Header() {
           },
         ]
       : []),
->>>>>>> 033917d046c9641d5a34dbdb93b5edd3a65971a5
   ];
 
   function classNames(...classes) {
@@ -236,91 +240,8 @@ export default function Header() {
           <div className="flex-shrink-0 flex items-center justify-center sm:justify-start">
             <img className="h-10 w-auto" src={ecoders_logo} alt="Logo" />
             <span>
-              <h2 className="text-black-900 text-bold">ECODERS</h2>
+              <h2 className="text-black-900 font-bold">ECODERS</h2>
             </span>
-          </div>
-
-          {/* Right-side content for mobile view */}
-          <div className="flex items-center sm:hidden">
-<<<<<<< HEAD
-            {/* Profile dropdown for mobile */}
-            <div className="ml-3 relative">
-              <button
-                onClick={toggleAvatarDropdown}
-                className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white"
-              >
-                <span className="sr-only">Open user menu</span>
-                <img
-                  alt=""
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  className="h-8 w-8 rounded-full"
-                />
-              </button>
-              {avatarDropdownOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                  <a
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <FiUser className="inline mr-2" /> Your Profile
-                  </a>
-                  <a
-                    href="/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <FiLogOut className="inline mr-2" /> Sign out
-                  </a>
-                </div>
-              )}
-            </div>
-=======
-            {isLoggedIn ? (
-              <div className="ml-3 relative">
-                <button
-                  onClick={toggleAvatarDropdown}
-                  className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white"
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    alt=""
-                    src={user.avatar || "https://via.placeholder.com/150"}
-                    className="h-8 w-8 rounded-full"
-                  />
-                </button>
-                {avatarDropdownOpen && (
-                  <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                    <a
-                      href="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      <FiUser className="inline mr-2" /> Your Profile
-                    </a>
-                    <a
-                      onClick={handleLogout}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                    >
-                      <FiLogOut className="inline mr-2" /> Sign out
-                    </a>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <a
-                  href="/login"
-                  className="text-sm text-gray-700 hover:text-black px-3 py-2"
-                >
-                  Login
-                </a>
-                <a
-                  href="/register"
-                  className="text-sm text-gray-700 hover:text-black px-3 py-2"
-                >
-                  Register
-                </a>
-              </div>
-            )}
->>>>>>> 033917d046c9641d5a34dbdb93b5edd3a65971a5
           </div>
 
           {/* Desktop Menu Items */}
@@ -346,31 +267,32 @@ export default function Header() {
                   >
                     <div className="w-full flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
                       <div className="p-4">
-                        {item.content.map((contentItem) => (
-                          <div
-                            key={contentItem.name}
-                            className="group relative flex gap-x-6 rounded-lg p-4 hover:bg-gray-50"
-                          >
-                            <div className="mt-1 flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                              <contentItem.icon
-                                aria-hidden="true"
-                                className="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
-                              />
+                        {item.content &&
+                          item.content.map((contentItem) => (
+                            <div
+                              key={contentItem.name}
+                              className="group relative flex gap-x-6 rounded-lg p-4 hover:bg-gray-50"
+                            >
+                              <div className="mt-1 flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                                <contentItem.icon
+                                  aria-hidden="true"
+                                  className="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
+                                />
+                              </div>
+                              <div>
+                                <a
+                                  href={contentItem.href}
+                                  className="font-semibold text-gray-900"
+                                >
+                                  {contentItem.name}
+                                  <span className="absolute inset-0" />
+                                </a>
+                                <p className="mt-1 text-gray-600">
+                                  {contentItem.description}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <a
-                                href={contentItem.href}
-                                className="font-semibold text-gray-900"
-                              >
-                                {contentItem.name}
-                                <span className="absolute inset-0" />
-                              </a>
-                              <p className="mt-1 text-gray-600">
-                                {contentItem.description}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                       <div className="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
                         {callsToAction.map((ctaItem) => (
@@ -417,20 +339,10 @@ export default function Header() {
                     onClick={toggleAvatarDropdown}
                     className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white"
                   >
-<<<<<<< HEAD
-                    <FiUser className="inline mr-2" /> Your Profile
-                  </a>
-                  <a
-                    href="/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <FiLogOut className="inline mr-2" /> Sign out
-                  </a>
-=======
                     <span className="sr-only">Open user menu</span>
                     <img
                       alt=""
-                      src={user.avatar || "https://via.placeholder.com/150"}
+                      src={user?.avatar || "https://via.placeholder.com/150"}
                       className="h-8 w-8 rounded-full"
                     />
                   </button>
@@ -450,22 +362,15 @@ export default function Header() {
                       </a>
                     </div>
                   )}
->>>>>>> 033917d046c9641d5a34dbdb93b5edd3a65971a5
                 </div>
               </>
             ) : (
               <>
                 <a
                   href="/login"
-                  className="text-sm text-gray-700 hover:text-black px-3 py-2"
+                  className="text-sm bg-gray-100 rounded hover:text-grey-900 px-3 py-2 bold  font-semibold"
                 >
                   Login
-                </a>
-                <a
-                  href="/register"
-                  className="text-sm text-gray-700 hover:text-black px-3 py-2"
-                >
-                  Register
                 </a>
               </>
             )}
@@ -501,24 +406,6 @@ export default function Header() {
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600 cursor-pointer"
                 >
                   Sign out
-                </a>
-              </div>
-            </div>
-          )}
-          {!isLoggedIn && (
-            <div className="pt-4 pb-3 border-t border-gray-200">
-              <div className="px-2 space-y-1">
-                <a
-                  href="/login"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
-                >
-                  Login
-                </a>
-                <a
-                  href="/register"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-indigo-600"
-                >
-                  Register
                 </a>
               </div>
             </div>

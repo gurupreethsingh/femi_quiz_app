@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiLogIn } from "react-icons/fi";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -9,12 +9,38 @@ export default function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Standard email pattern
+    return emailRegex.test(email) && !/\s/.test(email); // No spaces allowed
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[^\s]{8,}$/;
+    return passwordRegex.test(password) && !/\s/.test(password); // No spaces allowed
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Clear any previous errors
 
+    if (!validateEmail(email)) {
+      setError("Invalid email address. Email cannot contain spaces.");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError(
+        "Invalid password. Password must be at least 8 characters long, contain one uppercase letter, one lowercase letter, one number, one special character, and cannot contain spaces."
+      );
+      return;
+    }
+
     try {
-      const response = await axios.post("/login", { email, password });
+      const response = await axios.post("http://localhost:5000/login", {
+        email,
+        password,
+      });
 
       if (response.status === 200) {
         const { token, user } = response.data;
@@ -42,7 +68,9 @@ export default function Login() {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
     }
   };
 

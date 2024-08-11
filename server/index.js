@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const { body, validationResult } = require("express-validator");
+const cors = require("cors");
 
 // Models
 const User = require("./models/User");
@@ -18,6 +19,7 @@ const Exam = require("./models/ExamModel");
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // Environment Variables
 const JWT_SECRET = process.env.JWT_SECRET || "ecoders_jwt_secret";
@@ -33,6 +35,20 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Unable to connect to MongoDB", err));
+
+// Function to compress images using sharp
+const compressImage = async (filePath) => {
+  const compressedFilePath = filePath.replace(
+    path.extname(filePath),
+    "-compressed.jpg"
+  );
+  await sharp(filePath)
+    .resize(800)
+    .jpeg({ quality: 80 })
+    .toFile(compressedFilePath);
+  await fs.unlink(filePath); // Delete the original file after compression
+  return compressedFilePath;
+};
 
 // Middleware to authenticate and attach user info
 const authenticateUser = async (req, res, next) => {
@@ -66,17 +82,16 @@ const authenticateUser = async (req, res, next) => {
   }
 };
 
-// Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const username = req.user.username;
-    const userDir = path.join(__dirname, "uploads", username);
+    const role = req.user.role;
+    const baseDir = path.join(__dirname, "uploads", role);
 
-    if (!fs.existsSync(userDir)) {
-      fs.mkdirSync(userDir, { recursive: true });
+    if (!fs.existsSync(baseDir)) {
+      fs.mkdirSync(baseDir, { recursive: true });
     }
 
-    cb(null, userDir);
+    cb(null, baseDir);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -85,7 +100,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { files: 5 },
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif/;
     const mimetype = filetypes.test(file.mimetype);
@@ -99,25 +113,7 @@ const upload = multer({
       cb(new Error("Only images are allowed!"));
     }
   },
-}).fields([
-  { name: "profileImage" },
-  { name: "backgroundImage" },
-  { name: "images" },
-]);
-
-// Function to compress images using sharp
-const compressImage = async (filePath) => {
-  const compressedFilePath = filePath.replace(
-    path.extname(filePath),
-    "-compressed.jpg"
-  );
-  await sharp(filePath)
-    .resize(800)
-    .jpeg({ quality: 80 })
-    .toFile(compressedFilePath);
-  await fs.unlink(filePath);
-  return compressedFilePath;
-};
+});
 
 // Routes for User Management
 app.post(
@@ -191,10 +187,31 @@ app.post("/logout", authenticateUser, (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 
-app.get("/users", authenticateUser, async (req, res) => {
+// Protected Routes for Projects, Courses, Exams
+app.get("/projects", authenticateUser, async (req, res) => {
   try {
-    const users = await User.find().select("-password");
-    res.json(users);
+    const projects = await Project.find({ userId: req.user.id });
+    res.json(projects);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/courses", authenticateUser, async (req, res) => {
+  try {
+    const courses = await Course.find({ userId: req.user.id });
+    res.json(courses);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/exams", authenticateUser, async (req, res) => {
+  try {
+    const exams = await Exam.find({ userId: req.user.id });
+    res.json(exams);
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "Server error" });
@@ -269,12 +286,10 @@ app.post("/reset-password/:token", async (req, res) => {
     user.resetPasswordExpires = undefined;
 
     await user.save();
-    res
-      .status(200)
-      .json({
-        message:
-          "Password has been reset successfully. You can now log in with your new password.",
-      });
+    res.status(200).json({
+      message:
+        "Password has been reset successfully. You can now log in with your new password.",
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "Server error" });
@@ -289,11 +304,77 @@ app.get("/reset-password/:token", (req, res) => {
     </form>`);
 });
 
-// Routes for Class Management (similar to your current implementation)
-// Consider splitting this into its own route file
+// Profile
 
-// Routes for Exam Management (similar to your current implementation)
-// Consider splitting this into its own route file
+// API route to get user profile data
+app.get("/api/user/profile", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.put(
+  "/updateUser",
+  authenticateUser,
+  upload.single("profileImage"),
+  async (req, res) => {
+    try {
+      const { name, email, password, phone, address, designation, role } =
+        req.body;
+
+      const updates = {
+        name,
+        email,
+        phone,
+        address,
+        designation,
+        role,
+      };
+
+      // If password is provided, hash it
+      if (password) {
+        const salt = await bcrypt.genSalt(10);
+        updates.password = await bcrypt.hash(password, salt);
+      }
+
+      // Debugging: Check if file is received
+      console.log("Received file:", req.file);
+
+      // Handle profile image upload
+      if (req.file) {
+        try {
+          const profileImagePath = await compressImage(req.file.path);
+          updates.profileImage = profileImagePath;
+          console.log(
+            "Profile image uploaded and compressed:",
+            profileImagePath
+          );
+        } catch (err) {
+          console.error("Error compressing image:", err.message);
+          return res.status(500).json({ message: "Error processing image" });
+        }
+      }
+
+      // Update user in the database
+      const updatedUser = await User.findByIdAndUpdate(req.user.id, updates, {
+        new: true,
+      });
+
+      console.log("User updated successfully");
+      res.status(200).json(updatedUser);
+    } catch (err) {
+      console.error("Error updating user:", err.message);
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

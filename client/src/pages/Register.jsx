@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FiUserPlus } from "react-icons/fi";
-import axios from "axios"; // Import axios for making API requests
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -8,10 +9,44 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+
+  const validateName = (name) => {
+    const nameRegex = /^.*\S.*$/; // Ensure the name is not all spaces and has at least one non-space character
+    return nameRegex.test(name);
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Standard email pattern
+    return emailRegex.test(email) && !/\s/.test(email); // No spaces allowed
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[^\s]{8,}$/;
+    return passwordRegex.test(password) && !/\s/.test(password); // No spaces allowed
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Clear any previous errors
+
+    if (!validateName(name)) {
+      setError("Invalid name. Name cannot be all spaces.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError("Invalid email address. Email cannot contain spaces.");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError(
+        "Invalid password. Password must be at least 8 characters long, contain one uppercase letter, one lowercase letter, one number, one special character, and cannot contain spaces."
+      );
+      return;
+    }
 
     try {
       const response = await axios.post("http://localhost:5000/register", {
@@ -22,10 +57,13 @@ export default function Register() {
 
       if (response.status === 201) {
         setSuccess("Registration successful! Please log in.");
-        // Optionally, redirect the user to the login page
+        alert("Registration successful");
+        navigate("/login");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Registration failed. Please try again."
+      );
     }
   };
 

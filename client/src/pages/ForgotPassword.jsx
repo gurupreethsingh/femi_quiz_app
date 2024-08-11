@@ -7,14 +7,24 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Standard email pattern
+    return emailRegex.test(email) && !/\s/.test(email); // No spaces allowed
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
 
+    if (!validateEmail(email)) {
+      setError("Invalid email address. Email cannot contain spaces.");
+      return;
+    }
+
     try {
       const response = await axios.post("/forgot-password", { email });
-      
+
       if (response.status === 200) {
         setMessage("A password reset link has been sent to your email.");
       }
@@ -44,7 +54,7 @@ const ForgotPassword = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {message && <div className="text-green-500 text-sm">{message}</div>}
           {error && <div className="text-red-500 text-sm">{error}</div>}
-          
+
           <div>
             <label
               htmlFor="email"

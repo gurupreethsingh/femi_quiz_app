@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./pages/About";
 import AdminDashboard from "./pages/AdminDashboard";
 import Allusers from "./pages/Allusers";
-import BlogPage from "./pages/BlogPage";
 import Blogs from "./pages/Blogs";
 import Contact from "./pages/Contact";
 import Courses from "./pages/Courses";
@@ -40,7 +39,6 @@ function App() {
           <Route path="/single-course/:id" element={<SingleCourse />}></Route>
           <Route path="/all-exams" element={<Exams />}></Route>
           <Route path="/all-users" element={<Allusers />}></Route>
-          <Route path="/blogpage" element={<BlogPage />}></Route>
           <Route path="/blogs" element={<Blogs />}></Route>
           <Route path="/contact" element={<Contact />}></Route>
           <Route path="/forgot-password" element={<ForgotPassword />}></Route>
