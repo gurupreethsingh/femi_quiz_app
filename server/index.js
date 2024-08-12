@@ -157,33 +157,78 @@ app.post(
   }
 );
 
+// app.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(400).json({ message: "Invalid credentials" });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: "Invalid credentials" });
+//     }
+
+//     const payload = {
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         avatar: user.user_image,
+//       },
+//     };
+
+//     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+//     res.json({ token, user: payload.user });
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Check if the user exists
     const user = await User.findOne({ email });
     if (!user) {
+      console.log("User not found with email:", email);
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Log the stored hash and incoming plaintext password
+    console.log("Stored Hash:", user.password);
+    console.log("Entered Password:", password);
+
+    // Compare the provided password with the stored hash
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log("Password does not match.");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Create a payload for the JWT token
     const payload = {
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
         avatar: user.user_image,
+        role: user.role, // Include role if available
       },
     };
 
+    // Sign the JWT token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+    console.log("Token generated successfully:", token);
+
+    // Send back the token and user data
     res.json({ token, user: payload.user });
   } catch (err) {
-    console.error(err.message);
+    console.error("Server error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 });
