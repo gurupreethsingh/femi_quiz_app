@@ -342,7 +342,11 @@ export default function Header() {
                     <span className="sr-only">Open user menu</span>
                     <img
                       alt=""
-                      src={user?.avatar || "https://via.placeholder.com/150"}
+                      src={
+                        user?.user_image
+                          ? `http://localhost:5000/${user.user_image}`
+                          : "https://via.placeholder.com/150"
+                      }
                       className="h-8 w-8 rounded-full"
                     />
                   </button>
@@ -368,7 +372,7 @@ export default function Header() {
               <>
                 <a
                   href="/login"
-                  className="text-sm bg-gray-100 rounded hover:text-grey-900 px-3 py-2 bold  font-semibold"
+                  className="text-sm bg-gray-100 rounded hover:text-grey-900 px-3 py-2 bold font-semibold"
                 >
                   Login
                 </a>

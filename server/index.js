@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const fs = require("fs-extra");
 const path = require("path");
-const sharp = require("sharp");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -20,6 +19,7 @@ const Exam = require("./models/ExamModel");
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Environment Variables
 const JWT_SECRET = process.env.JWT_SECRET || "ecoders_jwt_secret";
@@ -35,20 +35,6 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Unable to connect to MongoDB", err));
-
-// Function to compress images using sharp
-const compressImage = async (filePath) => {
-  const compressedFilePath = filePath.replace(
-    path.extname(filePath),
-    "-compressed.jpg"
-  );
-  await sharp(filePath)
-    .resize(800)
-    .jpeg({ quality: 80 })
-    .toFile(compressedFilePath);
-  await fs.unlink(filePath); // Delete the original file after compression
-  return compressedFilePath;
-};
 
 // Middleware to authenticate and attach user info
 const authenticateUser = async (req, res, next) => {
@@ -73,7 +59,7 @@ const authenticateUser = async (req, res, next) => {
       username: user.username,
       email: user.email,
       role: user.role,
-      avatar: user.avatar,
+      avatar: user.user_image,
     };
 
     next();
@@ -82,26 +68,45 @@ const authenticateUser = async (req, res, next) => {
   }
 };
 
+// Multer Storage Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const role = req.user.role;
-    const baseDir = path.join(__dirname, "uploads", role);
+    let uploadFolder = "uploads/";
 
-    if (!fs.existsSync(baseDir)) {
-      fs.mkdirSync(baseDir, { recursive: true });
+    // Determine the folder based on role
+    if (req.user && req.user.role) {
+      if (req.user.role === "admin") {
+        uploadFolder += "admins";
+      } else if (req.user.role === "teacher") {
+        uploadFolder += "teachers";
+      } else if (req.user.role === "student") {
+        uploadFolder += "students";
+      } else {
+        uploadFolder += "users";
+      }
+    } else {
+      uploadFolder += "users";
     }
 
-    cb(null, baseDir);
+    // Ensure the folder exists
+    if (!fs.existsSync(uploadFolder)) {
+      fs.mkdirSync(uploadFolder, { recursive: true });
+    }
+
+    cb(null, uploadFolder);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
   },
 });
 
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|gif/;
+    const filetypes = /jpeg|jpg|webp|png|gif/;
     const mimetype = filetypes.test(file.mimetype);
     const extname = filetypes.test(
       path.extname(file.originalname).toLowerCase()
@@ -171,7 +176,7 @@ app.post("/login", async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        avatar: user.avatar,
+        avatar: user.user_image,
       },
     };
 
@@ -304,6 +309,16 @@ app.get("/reset-password/:token", (req, res) => {
     </form>`);
 });
 
+// getting all the users from the database.
+app.get("/api/all-users", authenticateUser, async (req, res) => {
+  try {
+    const users = await User.find(); // Assuming you have a User model
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching users" });
+  }
+});
+
 // Profile
 
 // API route to get user profile data
@@ -323,7 +338,7 @@ app.get("/api/user/profile", authenticateUser, async (req, res) => {
 app.put(
   "/updateUser",
   authenticateUser,
-  upload.single("profileImage"),
+  upload.single("user_image"),
   async (req, res) => {
     try {
       const { name, email, password, phone, address, designation, role } =
@@ -349,17 +364,8 @@ app.put(
 
       // Handle profile image upload
       if (req.file) {
-        try {
-          const profileImagePath = await compressImage(req.file.path);
-          updates.profileImage = profileImagePath;
-          console.log(
-            "Profile image uploaded and compressed:",
-            profileImagePath
-          );
-        } catch (err) {
-          console.error("Error compressing image:", err.message);
-          return res.status(500).json({ message: "Error processing image" });
-        }
+        updates.user_image = req.file.path;
+        console.log("Profile image uploaded:", req.file.path);
       }
 
       // Update user in the database

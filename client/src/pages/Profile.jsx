@@ -12,11 +12,10 @@ export default function Profile() {
     designation: "",
     role: "",
   });
-  const [profileImage, setProfileImage] = useState(null);
+  const [user_image, setUserImage] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch user data when the component loads
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -38,7 +37,7 @@ export default function Profile() {
 
         if (response.status === 200) {
           setUserData(response.data);
-          setProfileImage(response.data.profileImage);
+          setUserImage(response.data.user_image);
         } else {
           setError("Failed to fetch user data.");
         }
@@ -50,7 +49,6 @@ export default function Profile() {
     fetchUserData();
   }, []);
 
-  // Handle input changes
   const handleChange = (e) => {
     setUserData({
       ...userData,
@@ -58,12 +56,10 @@ export default function Profile() {
     });
   };
 
-  // Handle profile image upload
-  const handleProfileImageUpload = (e) => {
-    setProfileImage(e.target.files[0]);
+  const handleUserImageUpload = (e) => {
+    setUserImage(e.target.files[0]);
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -84,7 +80,9 @@ export default function Profile() {
     formData.append("designation", userData.designation || "");
     formData.append("role", userData.role || "");
 
-    if (profileImage) formData.append("profileImage", profileImage);
+    if (user_image && typeof user_image === "object") {
+      formData.append("user_image", user_image);
+    }
 
     try {
       const response = await axios.put(
@@ -100,8 +98,12 @@ export default function Profile() {
 
       if (response.status === 200) {
         alert("Profile updated successfully!");
-        setUserData(response.data); // Set all the updated data
-        setProfileImage(response.data.profileImage); // Update profile image
+        setUserData(response.data);
+        setUserImage(response.data.user_image);
+        localStorage.setItem("user", JSON.stringify(response.data));
+
+        // Reload the page after successful update
+        window.location.reload();
       } else {
         setError("Failed to update profile.");
         console.error("Unexpected response status:", response.status);
@@ -125,10 +127,10 @@ export default function Profile() {
           <div className="w-48 h-48 rounded-md overflow-hidden border border-gray-300">
             <img
               src={
-                profileImage
-                  ? URL.createObjectURL(profileImage)
-                  : userData.profileImage
-                  ? userData.profileImage
+                user_image
+                  ? typeof user_image === "object"
+                    ? URL.createObjectURL(user_image)
+                    : `http://localhost:5000/${user_image}`
                   : "https://via.placeholder.com/150"
               }
               alt="Profile"
@@ -142,18 +144,18 @@ export default function Profile() {
             <p className="text-blue-600 text-lg mt-2">{userData.role}</p>
             <div className="mt-6 flex items-center gap-x-3">
               <label
-                htmlFor="profileImage"
+                htmlFor="user_image"
                 className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 cursor-pointer"
               >
                 Change Photo
               </label>
               <input
                 type="file"
-                id="profileImage"
-                name="profileImage"
+                id="user_image"
+                name="user_image"
                 accept="image/*"
                 className="hidden"
-                onChange={handleProfileImageUpload}
+                onChange={handleUserImageUpload}
               />
               <FiCamera className="text-blue-600 h-6 w-6" />
             </div>

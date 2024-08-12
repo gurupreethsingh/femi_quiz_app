@@ -14,7 +14,7 @@ const userSchema = new Schema(
       enum: ["user", "admin", "teacher", "student", "hr"],
       default: "user",
     },
-    profileImage: { type: String }, // URL or file path for the profile image
+    user_image: { type: String }, // URL or file path for the profile image
   },
   {
     timestamps: true, // Automatically add createdAt and updatedAt timestamps
