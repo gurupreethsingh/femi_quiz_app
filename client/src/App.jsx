@@ -2,7 +2,6 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./pages/About";
-import AdminDashboard from "./pages/AdminDashboard";
 import Allusers from "./pages/Allusers";
 import Blogs from "./pages/Blogs";
 import Contact from "./pages/Contact";
@@ -23,8 +22,15 @@ import SingleCourse from "./pages/SingleCourse";
 import SingleExam from "./pages/SingleExam";
 import SingleTutorial from "./pages/SingleTutorial";
 import SingleUser from "./pages/SingleUser";
-import StudentDashboard from "./pages/StudentDashboard";
-import TeacherDashboard from "./pages/TeacherDashboard";
+import StudentDashboard from "./pages/student_pages/StudentDashboard";
+import TeacherDashboard from "./pages/teacher_pages/TeacherDashboard";
+import RegisterTeacher from "./pages/teacher_pages/RegisterTeacher";
+import TeacherLogin from "./pages/teacher_pages/TeacherLogin";
+import TeacherApprovalPending from "./pages/teacher_pages/TeacherApprovalPending";
+import AdminLogin from "./pages/admin_pages/AdminLogin";
+import StudentLogin from "./pages/student_pages/StudentLogin";
+import AdminDashboard from "./pages/admin_pages/AdminDashboard";
+import AdminRegister from "./pages/admin_pages/AdminRegister";
 
 function App() {
   return (
@@ -53,6 +59,17 @@ function App() {
           <Route path="/single-blog/:id" element={<SingleBlog />}></Route>
           <Route path="/single-course/:id" element={<SingleCourse />}></Route>
           <Route path="/single-exam/:id" element={<SingleExam />}></Route>
+          <Route path="/teacher-register" element={<RegisterTeacher />}></Route>
+          <Route path="/teacher-login" element={<TeacherLogin />}></Route>
+          <Route path="/admin-login" element={<AdminLogin />}></Route>
+          <Route path="/admin-register" element={<AdminRegister />}></Route>
+          <Route path="/admin-dashboard" element={<AdminDashboard />}></Route>
+          <Route path="/student-login" element={<StudentLogin />}></Route>
+          <Route
+            path="/teacher-approval-pending"
+            element={<TeacherApprovalPending />}
+          ></Route>
+
           <Route
             path="/single-tutorial/:id"
             element={<SingleTutorial />}

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema(
+const adminSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -9,16 +9,12 @@ const userSchema = new Schema(
     phone: { type: String },
     address: { type: String },
     designation: { type: String },
-    role: {
-      type: String,
-      enum: ["user", "admin", "teacher", "student", "hr"],
-      default: "user",
-    },
-    user_image: { type: String }, // URL or file path for the profile image
+    role: { type: String, default: "admin" },
+    admin_image: { type: String }, // URL or file path for the profile image
   },
   {
     timestamps: true, // Automatically add createdAt and updatedAt timestamps
   }
 );
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("Admin", adminSchema);

@@ -39,9 +39,16 @@ export default function AllUsers() {
     fetchUsers();
   }, []);
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users.filter((user) => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return (
+      user.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      user.email.toLowerCase().includes(lowerCaseSearchTerm) ||
+      user.designation?.toLowerCase().includes(lowerCaseSearchTerm) ||
+      user.role?.toLowerCase().includes(lowerCaseSearchTerm) ||
+      user.address?.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+  });
 
   return (
     <div className="bg-white py-12 sm:py-24">
