@@ -1,5 +1,14 @@
+// pagination admin dashboard
+
 import React, { useState, useEffect } from "react";
-import { FiSearch, FiList, FiGrid, FiSquare } from "react-icons/fi";
+import {
+  FiSearch,
+  FiList,
+  FiGrid,
+  FiSquare,
+  FiChevronLeft,
+  FiChevronRight,
+} from "react-icons/fi";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -10,6 +19,8 @@ export default function AdminDashboard() {
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 8; // Number of users to display per page
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,6 +83,14 @@ export default function AdminDashboard() {
     );
   });
 
+  // Pagination logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Main Content */}
@@ -115,30 +134,27 @@ export default function AdminDashboard() {
 
       {/* Stats Section */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8 p-6 max-w-7xl mx-auto">
-        <Link
-          to="/admin-dashboard/users"
-          className="p-4 bg-white shadow rounded-lg"
-        >
+        <Link to="#" className="p-4 bg-white shadow rounded-lg">
           <div className="text-sm font-semibold text-gray-500">Total Users</div>
           <div className="mt-2 text-2xl font-bold">{totalUsers}</div>
         </Link>
-        <Link
-          to="/admin-dashboard/admins"
-          className="p-4 bg-white shadow rounded-lg"
-        >
+        <Link to="/api/all-admins" className="p-4 bg-white shadow rounded-lg">
           <div className="text-sm font-semibold text-gray-500">
             Total Admins
           </div>
           <div className="mt-2 text-2xl font-bold">{admins.length}</div>
+          <div className="mt-2 text-sm font-semibold text-gray-500">
+            View All Admins
+          </div>
         </Link>
-        <Link
-          to="/admin-dashboard/teachers"
-          className="p-4 bg-white shadow rounded-lg"
-        >
+        <Link to="/api/all-teachers" className="p-4 bg-white shadow rounded-lg">
           <div className="text-sm font-semibold text-gray-500">
             Total Teachers
           </div>
           <div className="mt-2 text-2xl font-bold">{teachers.length}</div>
+          <div className="mt-2 text-sm font-semibold text-gray-500">
+            View All Teachers
+          </div>
         </Link>
         <Link
           to="/admin-dashboard/students"
@@ -161,7 +177,7 @@ export default function AdminDashboard() {
             : "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
         }`}
       >
-        {filteredUsers.map((user) => {
+        {currentUsers.map((user) => {
           const imageUrl = user.user_image
             ? `http://localhost:5000/${user.user_image.replace(/\\/g, "/")}`
             : "https://via.placeholder.com/150";
@@ -217,6 +233,27 @@ export default function AdminDashboard() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-6 p-6 max-w-7xl mx-auto">
+        <button
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="p-2 bg-gray-300 rounded-md disabled:opacity-50"
+        >
+          <FiChevronLeft className="h-6 w-6 text-gray-600" />
+        </button>
+        <span className="text-gray-500">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="p-2 bg-gray-300 rounded-md disabled:opacity-50"
+        >
+          <FiChevronRight className="h-6 w-6 text-gray-600" />
+        </button>
       </div>
     </div>
   );

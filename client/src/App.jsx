@@ -31,6 +31,8 @@ import AdminLogin from "./pages/admin_pages/AdminLogin";
 import StudentLogin from "./pages/student_pages/StudentLogin";
 import AdminDashboard from "./pages/admin_pages/AdminDashboard";
 import AdminRegister from "./pages/admin_pages/AdminRegister";
+import AllAdmins from "./pages/admin_pages/AllAdmins";
+import AllTeachers from "./pages/teacher_pages/AllTeachers";
 
 function App() {
   return (
@@ -61,12 +63,14 @@ function App() {
           <Route path="/single-exam/:id" element={<SingleExam />}></Route>
           <Route path="/teacher-register" element={<RegisterTeacher />}></Route>
           <Route path="/teacher-login" element={<TeacherLogin />}></Route>
+          <Route path="/api/all-teachers" element={<AllTeachers />}></Route>
           <Route path="/admin-login" element={<AdminLogin />}></Route>
           <Route path="/admin-register" element={<AdminRegister />}></Route>
           <Route path="/admin-dashboard" element={<AdminDashboard />}></Route>
+          <Route path="/api/all-admins" element={<AllAdmins />}></Route>
           <Route path="/student-login" element={<StudentLogin />}></Route>
           <Route
-            path="/teacher-approval-pending"
+            path="/api/teacher-approval-pending"
             element={<TeacherApprovalPending />}
           ></Route>
 
@@ -80,7 +84,7 @@ function App() {
             element={<StudentDashboard />}
           ></Route>
           <Route
-            path="/teacher-dashboard"
+            path="/api/teacher-dashboard"
             element={<TeacherDashboard />}
           ></Route>
           <Route path="/*" element={<PageNotFound />}></Route>

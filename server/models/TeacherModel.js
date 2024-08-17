@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const notificationSchema = new Schema({
+  message: { type: String, required: true },
+  date: { type: Date, default: Date.now },
+});
+
 const teacherSchema = new Schema(
   {
     name: { type: String, required: true },
@@ -54,8 +59,6 @@ const teacherSchema = new Schema(
         status: { type: String, enum: ["Pending", "Approved", "Rejected"] },
       },
     ], // Leave records for the teacher - Optional
-
-    // New optional fields
     specializations: [{ type: String }], // Areas of expertise or specialized subjects - Optional
     memberships: [
       {
@@ -71,6 +74,9 @@ const teacherSchema = new Schema(
         date_obtained: { type: Date },
       },
     ], // Certifications or training programs completed - Optional
+
+    status: { type: String, enum: ["Pending", "Approved"], default: "Pending" }, // New status field with default value "Pending"
+    notifications: [notificationSchema], // Notifications array to store messages
   },
   {
     timestamps: true, // Automatically add createdAt and updatedAt timestamps

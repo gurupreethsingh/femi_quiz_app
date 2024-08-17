@@ -207,11 +207,45 @@ app.post("/admin-login", async (req, res) => {
 });
 
 // Teacher Login
-app.post("/teacher-login", async (req, res) => {
-  const { email, password } = req.body;
+// app.post("/teacher-login", async (req, res) => {
+//   const { email, password } = req.body;
 
+//   try {
+//     const teacher = await Teacher.findOne({ email });
+//     if (!teacher) {
+//       return res.status(400).json({ message: "Invalid credentials" });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, teacher.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: "Invalid credentials" });
+//     }
+
+//     const payload = {
+//       user: {
+//         id: teacher._id,
+//         name: teacher.name,
+//         email: teacher.email,
+//         avatar: teacher.teacher_image,
+//         role: teacher.role,
+//       },
+//     };
+
+//     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+
+//     res.json({ token, user: payload.user });
+//   } catch (err) {
+//     console.error("Error logging in teacher:", err.message);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
+// Teacher Login Route (example)
+app.post("/teacher-login", async (req, res) => {
   try {
+    const { email, password } = req.body;
     const teacher = await Teacher.findOne({ email });
+
     if (!teacher) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -221,21 +255,22 @@ app.post("/teacher-login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const payload = {
+    const token = jwt.sign({ userId: teacher._id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.json({
+      token,
       user: {
         id: teacher._id,
         name: teacher.name,
         email: teacher.email,
-        avatar: teacher.teacher_image,
         role: teacher.role,
+        status: teacher.status, // Ensure status is correctly returned here
       },
-    };
-
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
-
-    res.json({ token, user: payload.user });
+    });
   } catch (err) {
-    console.error("Error logging in teacher:", err.message);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -311,6 +346,57 @@ app.get("/api/all-teachers", authenticateUser, async (req, res) => {
     res.json(teachers);
   } catch (err) {
     console.error("Error fetching teachers:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// teacher status approval.
+// Approve Teacher and Send Notification
+app.patch("/api/approve-teacher/:id", authenticateUser, async (req, res) => {
+  try {
+    const teacher = await Teacher.findById(req.params.id);
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    // Update the teacher's status to "Approved"
+    teacher.status = "Approved";
+
+    // Add a notification
+    const notification = {
+      message: "Your status has been approved. Welcome aboard!",
+    };
+    teacher.notifications.push(notification);
+
+    // Save the updated teacher document
+    await teacher.save();
+
+    res.json({ message: "Teacher status updated and notification sent" });
+  } catch (err) {
+    console.error("Error approving teacher:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// function to fetch all the teacher notifications.
+// Fetch Teacher Notifications
+app.get("/api/teacher-notifications", authenticateUser, async (req, res) => {
+  try {
+    // Find the teacher by the ID stored in the authenticated user's data
+    const teacher = await Teacher.findById(req.user.id).select("notifications");
+
+    // If the teacher is not found, return a 404 error
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    // Check if there are any notifications
+    const hasNewNotification = teacher.notifications.length > 0;
+
+    // Respond with the notifications and whether there are new ones
+    res.json({ notifications: teacher.notifications, hasNewNotification });
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

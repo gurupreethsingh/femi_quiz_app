@@ -49,28 +49,13 @@ export default function TeacherLogin() {
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
 
-        // Check the user's role and approval status
-        if (user.isApproved) {
-          // Navigate based on user role
-          switch (user.role) {
-            case "student":
-              navigate("/student-dashboard");
-              break;
-            case "teacher":
-              navigate("/teacher-dashboard");
-              break;
-            case "admin":
-              navigate("/admin-dashboard");
-              break;
-            case "hr":
-              navigate("/hr-dashboard");
-              break;
-            default:
-              navigate("/profile");
-          }
+        // Check the user's approval status and redirect accordingly
+        if (user.status === "Approved") {
+          navigate("/api/teacher-dashboard");
+        } else if (user.status === "Pending") {
+          navigate("/api/teacher-approval-pending");
         } else {
-          // Redirect to approval pending page if not approved
-          navigate("/teacher-approval-pending");
+          setError("Unexpected status. Please contact support.");
         }
       }
     } catch (err) {
@@ -158,7 +143,7 @@ export default function TeacherLogin() {
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">
-          Not registered as teacher ?{" "}
+          Not registered as teacher?{" "}
           <a
             href="/teacher-register"
             className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"

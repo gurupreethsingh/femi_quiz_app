@@ -97,8 +97,11 @@ export default function Header() {
     })
       .then((response) => {
         if (response.ok) {
-          // Navigate to the login page after successful logout
-          navigate("/login");
+          // Alert the user on successful logout
+          alert("You have successfully logged out.");
+
+          // Navigate to the home page after successful logout
+          navigate("/");
         }
       })
       .catch((error) => {
@@ -106,7 +109,7 @@ export default function Header() {
       });
 
     // Ensure navigation happens even if there's an issue with the fetch
-    navigate("/login");
+    navigate("/");
   };
 
   useEffect(() => {
